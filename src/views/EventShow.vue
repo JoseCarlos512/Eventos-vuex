@@ -37,6 +37,7 @@ export default {
         ...mapState('event',['event'])
     },
     created() {
+        alert(this.id);
         this.$store.dispatch('event/fetchEvent', this.id);
     }
     /*,

@@ -27,9 +27,22 @@ export default {
                 commit("INCREMENT_COUNT", incrementBy);
             }
         },
-        createEvent({ commit }, event) {
+        createEvent({ commit, dispatch }, event) {
           return EventService.postEvent(event).then( () => {
               commit('ADD_EVENT', event.data)
+              const notification = {
+                type: 'success',
+                message: 'Your event has been created!'
+              }
+              dispatch('notification/add', notification, { root: true });
+            })
+            .catch(error => {
+              const notification = {
+                type: 'error',
+                message: 'There was a problem creating your event: ' + error.message
+              }
+              dispatch('notification/add', notification, { root: true });
+              throw error
             })
         },
         fetchEvents({ commit, state }, {perPage, page}) {
@@ -37,26 +50,39 @@ export default {
             .then(response => {
               //console.log('Total events are ' + response.headers['x-total-count']) //Calcula la cantidad de eventos que tengo en la lista
               state.mIntTotal = response.headers['x-total-count'];
-    
               commit('SET_EVENTS', response.data)
             })
             .catch(error => {
-              console.log('There was an error:', error.response)
+              const notification = {
+                type: 'error',
+                message: 'There was a problem fetching events: ' + error.message
+              }
+              dispatch('notification/add', notification, { root: true }) // root: true -> Quiere decir que busca desde la raiz hasta donde se indica
             })
         },
         fetchEvent({ commit, getters}, id) {
-
+          alert(id);
           var event = getters.getEventById(id)
-          console.log(event.date);
+          alert(event);
           if (event) { // Se ejecuta o carga la data si llego desde el click de la lista y accedo a event-show
+            alert("entro");
+            alert(event)
             commit('SET_EVENT', event)
           } else { // El else se ejecuta si recargo la pagina, porque se pierde la data que se trajo de la lista y se ejecuta la llamada api
             EventService.getEvent(id)
             .then(response => {
+              alert(response.data);
               commit('SET_EVENT', response.data)
+
             })
             .catch(error => {
-              console.log('There was an error:', error.response)
+              const notification = {
+                type: 'error',
+                message: 'There was a problem fetching an event: ' + error.message
+              }
+              dispatch('notification/add', notification, {
+                root: true
+              })
             })
           }
         },

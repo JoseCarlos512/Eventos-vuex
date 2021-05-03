@@ -1,0 +1,30 @@
+
+
+export default {
+    namespaced: true,
+    state: {
+        notifications: [],
+        nextId: 1,
+    },
+    mutations: {
+        PUSH(state, notification) {
+            state.notifications.push({
+              ...notification,
+              id: this.nextId++
+            })
+          },
+        DELETE(state, notificationToRemove) {
+            state.notifications = state.notifications.filter(
+            notification => notification.id !== notificationToRemove.id
+            )
+        }
+    },
+    actions: {
+        add({ commit }, notification) {
+            commit('PUSH', notification)
+        },
+        remove({ commit }, notificationToRemove) {
+            commit('DELETE', notificationToRemove)
+        }
+    }
+}
